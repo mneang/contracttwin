@@ -59,7 +59,7 @@ export default function CaseLab() {
         },
         cache: "no-store",
         body: JSON.stringify({ caseId }),
-        signal: AbortSignal.timeout(60000)
+        signal: AbortSignal.timeout(75000)
       });
 
       const data = await response.json();
@@ -72,10 +72,19 @@ export default function CaseLab() {
 
       setFinding(data as Finding);
     } catch (error) {
+      const timedOut =
+        error instanceof Error &&
+        (
+          error.name === "TimeoutError" ||
+          error.name === "AbortError"
+        );
+
       setError(
-        error instanceof Error
-          ? error.message
-          : "Analysis unavailable."
+        timedOut
+          ? "The analysis exceeded its time limit. No financial records were changed."
+          : error instanceof Error
+            ? error.message
+            : "Analysis unavailable."
       );
     } finally {
       setLoading(false);

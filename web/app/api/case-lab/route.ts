@@ -1,5 +1,5 @@
 import { readFile } from "node:fs/promises";
-import { GoogleGenAI } from "@google/genai";
+import { GoogleGenAI, ThinkingLevel } from "@google/genai";
 import { z } from "zod";
 
 const CASES = {
@@ -141,36 +141,88 @@ ${JSON.stringify(fixture, null, 2)}
       apiKey: process.env.GEMINI_API_KEY
     });
 
+    const candidates = [
+      {
+        model: "gemini-3.5-flash-lite",
+        thinkingLevel: ThinkingLevel.MINIMAL,
+        timeoutMs: 8000
+      },
+      {
+        model: "gemini-3.8-flash",
+        thinkingLevel: ThinkingLevel.LOW,
+        timeoutMs: 18000
+      }
+    ];
+
     let response: Awaited<
       ReturnType<typeof ai.models.generateContent>
     > | undefined;
 
-    for (let attempt = 1; attempt <= 3; attempt++) {
+    let usedModel = "";
+
+    for (const candidate of candidates) {
+      const started = Date.now();
+
       try {
         response = await ai.models.generateContent({
-          model: "gemini-3.8-flash",
+          model: candidate.model,
           contents: prompt,
           config: {
             responseMimeType: "application/json",
-            responseJsonSchema: jsonSchema
+            responseJsonSchema: jsonSchema,
+            thinkingConfig: {
+              thinkingLevel: candidate.thinkingLevel
+            },
+            automaticContinuation: false,
+            abortSignal: AbortSignal.timeout(
+              candidate.timeoutMs
+            )
           }
         });
+
+        usedModel = candidate.model;
+
+        console.info("Case Lab inference completed", {
+          caseId,
+          model: usedModel,
+          durationMs: Date.now() - started
+        });
+
         break;
       } catch (error) {
         const status = Number(
           (error as { status?: number }).status
         );
 
-        if (
-          ![429, 502, 503, 504].includes(status) ||
-          attempt === 3
-        ) {
+        const name =
+          error instanceof Error ? error.name : "Unknown";
+
+        const message =
+          error instanceof Error ? error.message : "";
+
+        const timedOut =
+          name === "AbortError" ||
+          name === "TimeoutError" ||
+          /timed out|timeout|aborted/i.test(message);
+
+        console.warn("Case Lab inference failed", {
+          caseId,
+          model: candidate.model,
+          status: Number.isFinite(status) ? status : null,
+          name,
+          durationMs: Date.now() - started
+        });
+
+        const retryable =
+          timedOut ||
+          [408, 429, 500, 502, 503, 504].includes(status);
+
+        if (!retryable ||
+            candidate === candidates[candidates.length - 1]) {
           throw error;
         }
 
-        await new Promise(resolve =>
-          setTimeout(resolve, 600 * 2 ** (attempt - 1))
-        );
+        console.info("Trying alternate supported AI model.");
       }
     }
 
@@ -242,7 +294,7 @@ ${JSON.stringify(fixture, null, 2)}
       {
         caseId,
         source: "Synthetic contract test",
-        model: "gemini-3.8-flash",
+        model: usedModel,
         validation: "PASS",
         ...finding
       },
@@ -253,12 +305,25 @@ ${JSON.stringify(fixture, null, 2)}
       (error as { status?: number }).status
     );
 
-    const temporary = [429, 502, 503, 504].includes(status);
+    const name =
+      error instanceof Error ? error.name : "";
+
+    const message =
+      error instanceof Error ? error.message : "";
+
+    const timedOut =
+      name === "TimeoutError" ||
+      name === "AbortError" ||
+      /timed out|timeout|aborted/i.test(message);
+
+    const temporary =
+      timedOut ||
+      [408, 429, 500, 502, 503, 504].includes(status);
 
     return Response.json(
       {
         error: temporary
-          ? "The AI provider is temporarily unavailable. Please retry later."
+          ? "Live AI analysis is temporarily unavailable. The request stopped safely. No financial records were changed."
           : "Analysis could not be verified. No financial action was taken."
       },
       {
