@@ -1,6 +1,7 @@
 import { readFile } from "node:fs/promises";
 import { verifyRecoveryState } from "../lib/recovery-integrity";
 import { Suspense } from "react";
+import CaseLab from "../components/case-lab";
 import { connection } from "next/server";
 
 
@@ -303,6 +304,8 @@ async function RecoveryScreen() {
                 not a collected payment or recovered revenue.
               </p>
             </div>
+
+            <CaseLab />
 
             <div className="mt-5 grid gap-5 lg:grid-cols-5">
               <section className="rounded-2xl border border-white/10 bg-white/[0.04] p-6 lg:col-span-3">
