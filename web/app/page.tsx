@@ -1,6 +1,7 @@
 import { readFile } from "node:fs/promises";
 import { verifyRecoveryState } from "../lib/recovery-integrity";
 import { Suspense } from "react";
+import DemoReplay from "../components/demo-replay";
 import CaseLab from "../components/case-lab";
 import { connection } from "next/server";
 
@@ -392,6 +393,9 @@ async function RecoveryScreen() {
 
 
 export default function Home() {
+  if (process.env.NODE_ENV === "production") {
+    return <DemoReplay />;
+  }
   return (
     <Suspense
       fallback={
