@@ -1,0 +1,40 @@
+{
+  "case_id": "CASE-001",
+  "invoice": {
+    "id": "SIMULATED-INVOICE-001",
+    "reference": "AC-714",
+    "source_agreement_id": "A",
+    "service": "equipment rental",
+    "period": "October 2026",
+    "amount_usd": 900,
+    "status": "UNPAID"
+  },
+  "agreements": [
+    {
+      "id": "A",
+      "clauses": [
+        {
+          "id": "A-SCOPE",
+          "text": "Agreement A covers monthly equipment rental at USD 900."
+        },
+        {
+          "id": "A-END",
+          "text": "Agreement A expires on 2026-09-30, except that September 2026 maintenance charges remain collectible afterward."
+        }
+      ]
+    },
+    {
+      "id": "B",
+      "clauses": [
+        {
+          "id": "B-START",
+          "text": "Effective 2026-10-01, Agreement B supersedes Agreement A for equipment rental service only."
+        },
+        {
+          "id": "B-RATE",
+          "text": "For October 2026 and later, the monthly equipment rental charge under Agreement B is USD 1,200."
+        }
+      ]
+    }
+  ]
+}
