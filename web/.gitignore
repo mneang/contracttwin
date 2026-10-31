@@ -39,3 +39,9 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Private local recovery records
+/recovery-state/
+
+# Private recovery state
+/recovery-state/
