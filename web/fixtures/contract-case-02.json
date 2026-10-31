@@ -1,0 +1,42 @@
+{
+  "case_id": "CASE-002",
+  "invoice": {
+    "id": "SIMULATED-INVOICE-002",
+    "reference": "AC-714",
+    "source_agreement_id": "A",
+    "service": "September 2026 maintenance",
+    "period": "September 2026",
+    "amount_usd": 250,
+    "status": "UNPAID"
+  },
+  "agreements": [
+    {
+      "id": "A",
+      "reference": "AC-714",
+      "clauses": [
+        {
+          "id": "A-RENT",
+          "text": "Agreement A's equipment rental term ends on 2026-09-30."
+        },
+        {
+          "id": "A-MAINT",
+          "text": "Maintenance performed in September 2026 incurs a separate USD 250 charge under Agreement A, payable even if the invoice is issued after September 30."
+        }
+      ]
+    },
+    {
+      "id": "B",
+      "reference": "AC-714",
+      "clauses": [
+        {
+          "id": "B-SUPER",
+          "text": "Effective October 1, 2026, Agreement B supersedes Agreement A for equipment rental only. Earned September maintenance charges under Agreement A remain valid and collectible."
+        },
+        {
+          "id": "B-RATE",
+          "text": "October 2026 equipment rental is USD 1,200 under Agreement B."
+        }
+      ]
+    }
+  ]
+}

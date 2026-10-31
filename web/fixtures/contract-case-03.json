@@ -1,0 +1,38 @@
+{
+  "case_id": "CASE-003",
+  "invoice": {
+    "id": "SIMULATED-INVOICE-003",
+    "reference": "AC-714",
+    "source_agreement_id": "A",
+    "service": "October 2026 emergency maintenance",
+    "period": "October 2026",
+    "amount_usd": 400,
+    "status": "UNPAID"
+  },
+  "agreements": [
+    {
+      "id": "A",
+      "reference": "AC-714",
+      "clauses": [
+        {
+          "id": "A-AFTER",
+          "text": "Agreement A covers emergency maintenance at USD 400 per month through September 30, 2026. Service after that date requires separately signed Schedule S."
+        }
+      ]
+    },
+    {
+      "id": "B",
+      "reference": "AC-714",
+      "clauses": [
+        {
+          "id": "B-EXT",
+          "text": "Agreement B begins October 1, 2026 and covers equipment rental, but makes no determination about emergency maintenance charges."
+        },
+        {
+          "id": "B-SCHEDULE",
+          "text": "For October emergency maintenance, either a USD 400 continuation rate or a USD 550 replacement rate may apply according to signed Schedule S. Signed Schedule S has not been provided."
+        }
+      ]
+    }
+  ]
+}
